@@ -14,8 +14,10 @@ export function useChat(sessionId: string) {
     const socketRef = useRef<WebSocket | null>(null)
 
     const connect = useCallback(() => {
-        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const host = window.location.host === 'localhost:5173' ? 'localhost:8000' : window.location.host;
+        const BACKEND_URL = 'chatbot-backend-ashy-nu.vercel.app';
+        const isLocal = window.location.hostname === 'localhost';
+        const protocol = isLocal ? 'ws:' : 'wss:';
+        const host = isLocal ? 'localhost:8000' : BACKEND_URL;
         const wsUrl = `${protocol}//${host}/ws/chat/${sessionId}`;
 
         const socket = new WebSocket(wsUrl);
@@ -61,7 +63,10 @@ export function useChat(sessionId: string) {
 
     const resetSession = async () => {
         try {
-            await fetch(`/reset/${sessionId}`, { method: 'POST' });
+            const BACKEND_URL = 'https://chatbot-backend-ashy-nu.vercel.app';
+            const isLocal = window.location.hostname === 'localhost';
+            const baseUrl = isLocal ? '' : BACKEND_URL;
+            await fetch(`${baseUrl}/reset/${sessionId}`, { method: 'POST' });
             setMessages([{ role: 'ai', content: "Session reset. How can I help you?" }]);
         } catch (err) {
             console.error('Reset failed:', err);
