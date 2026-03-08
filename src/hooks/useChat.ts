@@ -14,7 +14,7 @@ export function useChat(sessionId: string) {
     const socketRef = useRef<WebSocket | null>(null)
 
     const connect = useCallback(() => {
-        const BACKEND_URL = 'chatbot-backend-ashy-nu.vercel.app';
+        const BACKEND_URL = 'chatbotbackend-production-4d4b.up.railway.app';
         const isLocal = window.location.hostname === 'localhost';
         const protocol = isLocal ? 'ws:' : 'wss:';
         const host = isLocal ? 'localhost:8000' : BACKEND_URL;
@@ -63,7 +63,7 @@ export function useChat(sessionId: string) {
 
     const resetSession = async () => {
         try {
-            const BACKEND_URL = 'https://chatbot-backend-ashy-nu.vercel.app';
+            const BACKEND_URL = 'https://chatbotbackend-production-4d4b.up.railway.app';
             const isLocal = window.location.hostname === 'localhost';
             const baseUrl = isLocal ? '' : BACKEND_URL;
             await fetch(`${baseUrl}/reset/${sessionId}`, { method: 'POST' });
