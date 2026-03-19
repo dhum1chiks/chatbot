@@ -14,12 +14,20 @@ export function useChat(sessionId: string) {
     const socketRef = useRef<WebSocket | null>(null)
 
     const connect = useCallback(() => {
-        const BACKEND_URL = 'chatbotbackend-production-4d4b.up.railway.app';
+        // Prefer a Vite env variable `VITE_BACKEND_URL` (e.g. https://api.example.com or api.example.com)
+        // Fallbacks:
+        // - when running locally (localhost / 127.0.0.1) use `localhost:8000`
+        // - otherwise use `import.meta.env.VITE_BACKEND_URL` if provided, else use the current host
+        const envBackend = import.meta.env.VITE_BACKEND_URL as string | undefined;
         const hostname = window.location.hostname;
         const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
-        const protocol = isLocal ? 'ws:' : 'wss:';
-        const host = isLocal ? 'localhost:8000' : BACKEND_URL;
-        const wsUrl = `${protocol}//${host}/ws/chat/${sessionId}`;
+
+        const backendHost = isLocal
+            ? 'localhost:8000'
+            : (envBackend ? envBackend.replace(/^https?:\/\//, '').replace(/^wss?:\/\//, '') : window.location.host);
+
+        const protocol = isLocal ? 'ws:' : (window.location.protocol === 'https:' ? 'wss:' : 'ws:');
+        const wsUrl = `${protocol}//${backendHost}/ws/chat/${sessionId}`;
 
         const socket = new WebSocket(wsUrl);
         socketRef.current = socket;
@@ -64,10 +72,13 @@ export function useChat(sessionId: string) {
 
     const resetSession = async () => {
         try {
-            const BACKEND_URL = 'https://chatbotbackend-production-4d4b.up.railway.app';
+            const envBackend = import.meta.env.VITE_BACKEND_URL as string | undefined;
             const hostname = window.location.hostname;
             const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
-            const baseUrl = isLocal ? 'http://localhost:8000' : BACKEND_URL;
+            const baseUrl = isLocal
+                ? 'http://localhost:8000'
+                : (envBackend ? (envBackend.startsWith('http') ? envBackend : `https://${envBackend}`) : `${window.location.protocol}//${window.location.host}`);
+
             await fetch(`${baseUrl}/reset/${sessionId}`, { method: 'POST' });
             setMessages([{ role: 'ai', content: "Session reset. How can I help you?" }]);
         } catch (err) {
