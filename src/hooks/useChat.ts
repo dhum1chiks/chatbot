@@ -15,7 +15,8 @@ export function useChat(sessionId: string) {
 
     const connect = useCallback(() => {
         const BACKEND_URL = 'chatbotbackend-production-4d4b.up.railway.app';
-        const isLocal = window.location.hostname === 'localhost';
+        const hostname = window.location.hostname;
+        const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
         const protocol = isLocal ? 'ws:' : 'wss:';
         const host = isLocal ? 'localhost:8000' : BACKEND_URL;
         const wsUrl = `${protocol}//${host}/ws/chat/${sessionId}`;
@@ -64,8 +65,9 @@ export function useChat(sessionId: string) {
     const resetSession = async () => {
         try {
             const BACKEND_URL = 'https://chatbotbackend-production-4d4b.up.railway.app';
-            const isLocal = window.location.hostname === 'localhost';
-            const baseUrl = isLocal ? '' : BACKEND_URL;
+            const hostname = window.location.hostname;
+            const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
+            const baseUrl = isLocal ? 'http://localhost:8000' : BACKEND_URL;
             await fetch(`${baseUrl}/reset/${sessionId}`, { method: 'POST' });
             setMessages([{ role: 'ai', content: "Session reset. How can I help you?" }]);
         } catch (err) {
