@@ -12,11 +12,24 @@ export const useBackendStatus = () => {
                 const hostname = window.location.hostname;
                 const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
 
-                const backendBase = isLocal
-                    ? 'http://localhost:8000'
-                    : (envBackend ? (envBackend.startsWith('http') ? envBackend : `https://${envBackend}`) : `https://${window.location.host}`);
+                // Robust URL construction
+                let backendBase = '';
+                if (isLocal) {
+                    backendBase = 'http://localhost:8000';
+                } else if (envBackend) {
+                    // Clean the URL: ensure protocol, remove trailing slashes
+                    let cleanUrl = envBackend.trim().replace(/\/+$/, '');
+                    if (!/^https?:\/\//i.test(cleanUrl)) {
+                        cleanUrl = `https://${cleanUrl}`;
+                    }
+                    backendBase = cleanUrl;
+                } else {
+                    // Fallback to relative path if no env var provided
+                    backendBase = window.location.origin;
+                }
 
                 const response = await fetch(`${backendBase}/health`, {
+
                     mode: 'cors',
                     cache: 'no-cache'
                 });
