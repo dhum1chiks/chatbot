@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import { useState, useEffect, useRef, useCallback } from 'react'
 
 export interface Message {

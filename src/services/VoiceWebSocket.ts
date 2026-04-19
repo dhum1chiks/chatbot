@@ -19,7 +19,9 @@ export interface WebSocketMessage {
   quality?: string;
 }
 
+/// <reference types="vite/client" />
 export interface VoiceWebSocketOptions {
+
   reconnectAttempts?: number;
   reconnectDelay?: number;
   timeout?: number;

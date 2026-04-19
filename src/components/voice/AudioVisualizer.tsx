@@ -20,7 +20,8 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
   color = '#6c5ce7'
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const animationRef = useRef<number>()
+  const animationRef = useRef<number | null>(null)
+
   const barsRef = useRef<number[]>(new Array(barCount).fill(0))
 
   useEffect(() => {
