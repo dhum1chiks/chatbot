@@ -5,6 +5,8 @@ import ChatInput from '../components/chat/ChatInput'
 import VoiceErrorDisplay from '../components/voice/VoiceErrorDisplay'
 import { useChat } from '../hooks/useChat'
 import { useVoice } from '../hooks/useVoice'
+import { useBackendStatus } from '../hooks/useBackendStatus'
+import { AudioVisualizer } from '../components/voice/AudioVisualizer'
 
 const ChatPage: React.FC = () => {
     // Use a stable session ID for this demo

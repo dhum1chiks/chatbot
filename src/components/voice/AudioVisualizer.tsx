@@ -10,7 +10,8 @@ interface AudioVisualizerProps {
   color?: string
 }
 
-const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
+export const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
+
   isActive,
   audioLevel = 0,
   className = '',
