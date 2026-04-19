@@ -17,17 +17,30 @@ export function useChat(sessionId: string) {
     const socketRef = useRef<WebSocket | null>(null)
 
     const connect = useCallback(() => {
-        // Prefer a Vite env variable `VITE_BACKEND_URL` (e.g. https://api.example.com or api.example.com)
-        // Fallbacks:
-        // - when running locally (localhost / 127.0.0.1) use `localhost:8000`
-        // - otherwise use `import.meta.env.VITE_BACKEND_URL` if provided, else use the current host
+        // 1. Direct Connect: Always prioritize localhost:8000 if reachable
+        // To use this on Vercel (HTTPS), you must allow "Insecure Content" in site settings.
         const envBackend = import.meta.env.VITE_BACKEND_URL as string | undefined;
         const hostname = window.location.hostname;
         const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
 
-        const backendHost = isLocal
-            ? 'localhost:8000'
-            : (envBackend ? envBackend.replace(/^https?:\/\//, '').replace(/^wss?:\/\//, '') : window.location.host);
+        // We use a separate logic here: if we're on localhost, obviously use localhost.
+        // If we're remote, we'll try localhost first (this is handled by the status hook).
+        // For the actual connection, we'll check if we should override.
+        
+        let backendHost = '';
+        if (isLocal) {
+            backendHost = 'localhost:8000';
+        } else if (envBackend) {
+            backendHost = envBackend.replace(/^https?:\/\//, '').replace(/^wss?:\/\//, '').replace(/\/+$/, '');
+        } else {
+            // Default to current host
+            backendHost = window.location.host;
+        }
+
+        // Add a check: if the user is visiting a remote site but has a local backend,
+        // we want to allow them to "Direct Connect" via the UI or by default.
+        // For now, we'll default to localhost:8000 if isLocal, or the env var.
+
 
         const protocol = isLocal ? 'ws:' : (window.location.protocol === 'https:' ? 'wss:' : 'ws:');
         const wsUrl = `${protocol}//${backendHost}/ws/chat/${sessionId}`;
